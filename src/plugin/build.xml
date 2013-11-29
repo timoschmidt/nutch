@@ -36,6 +36,8 @@
      <ant dir="index-metadata" target="deploy"/>
      <ant dir="indexer-elastic" target="deploy"/>
      <ant dir="indexer-solr" target="deploy"/>
+     <ant dir="indexer-searchperience" target="deploy"/>
+
      <ant dir="language-identifier" target="deploy"/>
      <ant dir="lib-http" target="deploy"/>
      <ant dir="lib-nekohtml" target="deploy"/>

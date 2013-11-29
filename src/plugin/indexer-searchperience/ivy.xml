@@ -34,6 +34,8 @@
     <!--get the artifact from our module name-->
     <artifact conf="master"/>
   </publications>
+  <dependencies>
+      <dependency org="org.apache.cxf" name="cxf-bundle-jaxrs" rev="2.7.7"/>
+  </dependencies>
 
-  
 </ivy-module>

@@ -14,71 +14,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 package org.apache.nutch.indexwriter.searchperience;
 
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.io.BufferedReader;
-import java.io.IOException;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.nutch.indexer.NutchDocument;
 import org.apache.nutch.indexer.IndexWriter;
-
+import org.apache.nutch.indexer.NutchDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.Response;
+
+import java.io.IOException;
 
 /**
  */
 public class SearchperienceIndexWriter implements IndexWriter {
   public static Logger LOG = LoggerFactory.getLogger(SearchperienceIndexWriter.class);
 
-  private static final int DEFAULT_MAX_BULK_DOCS = 250;
-  private static final int DEFAULT_MAX_BULK_LENGTH = 2500500;
-
-  private Client client;
-  private Node node;
-  private String defaultIndex;
-
   private Configuration config;
 
+  private WebClient client;
 
-  @Override
+	@Override
   public void open(JobConf job, String name) throws IOException {
 	  //create connection to rest api
+		try {
+			client = WebClient.create("http://api.saascluster.local/qvc/documents/");
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
   }
 
   @Override
   public void write(NutchDocument doc) throws IOException {
-	  //build searchperience xml document from nutch document
-	  //push over restapi
+	  System.out.println("SEARCHPERIENCE WRITE");
+	  try {
+		  String document = new String();
+		  System.out.println("SEARCHPERIENCE ONE");
+		  Response response = client.post(new String(""));
+	//	  System.out.println(response);
+	  } catch (Exception e) {
+		  System.out.println(e.getMessage());
+	  }
+
+	  System.out.println("SEARCHPERIENCE TEST");
   }
 
   @Override
   public void delete(String key) throws IOException {
+	  System.out.println("SEARCHPERIENCE DELETE");
 	  //delete by rest api
   }
 
   @Override
   public void update(NutchDocument doc) throws IOException {
+	  System.out.println("SEARCHPERIENCE UPDATE");
 	  //update by restapi
     write(doc);
   }
 
   @Override
   public void commit() throws IOException {
+	  System.out.println("SEARCHPERIENCE COMMIT");
 
   }
 
   @Override
   public void close() throws IOException {
+	  client.close();
 
+	  commit();
+	  System.out.println("SEARCHPERIENCE CLOSE");
   }
 
   @Override
