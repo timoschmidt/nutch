@@ -35,7 +35,7 @@
     <artifact conf="master"/>
   </publications>
   <dependencies>
-      <dependency org="org.apache.cxf" name="cxf-bundle-jaxrs" rev="2.7.7"/>
+      <dependency org="com.sun.jersey" name="jersey-bundle" rev="1.17.1" transitive="true"/>
   </dependencies>
 
 </ivy-module>

@@ -34,10 +34,10 @@
     <!--get the artifact from our module name-->
     <artifact conf="master"/>
   </publications>
-
+      <!--
   <dependencies>
         <dependency org="org.elasticsearch" name="elasticsearch" rev="0.90.1"
                     conf="*->default"/>
   </dependencies>
-  
+          -->
 </ivy-module>

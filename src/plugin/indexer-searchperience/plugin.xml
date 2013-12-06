@@ -22,7 +22,7 @@
     <library name="indexer-searchperience.jar">
       <export name="*" />
     </library>
-    
+
     <library name="jna-3.3.0.jar"/>
     <library name="jts-1.12.jar"/>
     <library name="log4j-1.2.17.jar"/>
@@ -38,6 +38,7 @@
     <library name="lucene-spatial-4.3.0.jar"/>
     <library name="lucene-suggest-4.3.0.jar"/>
     <library name="spatial4j-0.3.jar"/>
+    <library name="jersey-bundle-1.17.1.jar" />
   </runtime>
 
   <requires>

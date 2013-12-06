@@ -43,7 +43,7 @@ public interface DublinCore {
    * string or number conforming to a formal identification system. Example
    * formal identification systems include the Uniform Resource Identifier
    * (URI) (including the Uniform Resource Locator (URL)), the Digital Object
-   * Identifier (DOI) and the International Standard Book Number (ISBN).
+   * Identifier (DOI) and the International Standard SearchperienceDocument Number (ISBN).
    */
   public static final String IDENTIFIER = "identifier";
   

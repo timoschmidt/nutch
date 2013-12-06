@@ -18,15 +18,17 @@
 package org.apache.nutch.indexwriter.searchperience;
 
 
-import org.apache.cxf.jaxrs.client.WebClient;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.nutch.indexer.IndexWriter;
 import org.apache.nutch.indexer.NutchDocument;
+import org.apache.nutch.net.protocols.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.Response;
 
 import java.io.IOException;
 
@@ -37,34 +39,70 @@ public class SearchperienceIndexWriter implements IndexWriter {
 
   private Configuration config;
 
-  private WebClient client;
+  private Client client;
 
 	@Override
   public void open(JobConf job, String name) throws IOException {
-	  //create connection to rest api
+		System.out.println("SEARCHPERIENCE BEFORE OPEN");
 		try {
-			client = WebClient.create("http://api.saascluster.local/qvc/documents/");
 
+			//create connection to rest api
+			client = Client.create();
 		} catch (Exception e) {
+			if( e instanceof IOException) {
+				IOException ioe = (IOException) e;
+			} else {
+				System.out.println(e.getClass());
+			}
+			e.printStackTrace();
+
+			System.out.println("Open catch");
+		}
+		System.out.println("SEARCHPERIENCE AFTER OPEN");
+
+  }
+
+	@Override
+	public void write(NutchDocument doc) throws IOException {
+		System.out.println("SEARCHPERIENCE WRITE");
+		SearchperienceDocument o;
+		try {
+		//	SearchperienceDocument document = new SearchperienceDocument();
+		//	document.setForeignId("dsds");
+			WebResource resource = client.resource("http://url/qvc/documents");
+			client.addFilter(new HTTPBasicAuthFilter("user", "password"));
+
+			resource.queryParam("source", "source");
+			resource.queryParam("foreignId", "sasasa");
+			resource.queryParam("url", "http://foo.vbox/foo");
+			
+			System.out.println(resource.getRequestBuilder().toString());
+			String response = resource.post(String.class,"<foo>one</foo>");
+
+
+		} catch (UniformInterfaceException e) {
+
+
+
+
+			System.out.println("Write catch 1");
+
+			System.out.println(e.getResponse().getClientResponseStatus());
+			System.out.println(e.getResponse().getEntityInputStream());
+			System.out.println(e.getClass());
+
 			System.out.println(e.getMessage());
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e.getClass());
+
+			System.out.println("Write catch 2");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+
 		}
 
-  }
-
-  @Override
-  public void write(NutchDocument doc) throws IOException {
-	  System.out.println("SEARCHPERIENCE WRITE");
-	  try {
-		  String document = new String();
-		  System.out.println("SEARCHPERIENCE ONE");
-		  Response response = client.post(new String(""));
-	//	  System.out.println(response);
-	  } catch (Exception e) {
-		  System.out.println(e.getMessage());
-	  }
-
-	  System.out.println("SEARCHPERIENCE TEST");
-  }
+	}
 
   @Override
   public void delete(String key) throws IOException {
@@ -87,7 +125,7 @@ public class SearchperienceIndexWriter implements IndexWriter {
 
   @Override
   public void close() throws IOException {
-	  client.close();
+//	  client.close();
 
 	  commit();
 	  System.out.println("SEARCHPERIENCE CLOSE");
@@ -109,4 +147,6 @@ public class SearchperienceIndexWriter implements IndexWriter {
   public Configuration getConf() {
     return config;
   }
+
+
 } 
