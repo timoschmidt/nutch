@@ -27,7 +27,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.nutch.indexer.IndexWriter;
 import org.apache.nutch.indexer.NutchDocument;
+import org.apache.nutch.metadata.Metadata;
+
 import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  */
@@ -37,10 +40,22 @@ public class SearchperienceIndexWriter implements IndexWriter {
 
     private Client client;
 
+	private String endpoint;
+	
+	private String username;
+	
+	private String password;
+	
     @Override
     public void open(JobConf job, String name) throws IOException {
         System.out.println("SEARCHPERIENCE BEFORE OPEN");
+
+
+
         try {
+			endpoint 	= job.get(SearchperienceConstants.ENDPOINT);
+			username	= job.get(SearchperienceConstants.USERNAME);
+			password 	= job.get(SearchperienceConstants.PASSWORD);
 
             //create connection to rest api
             client = Client.create();
@@ -60,13 +75,18 @@ public class SearchperienceIndexWriter implements IndexWriter {
         LoggingFilter lg = new LoggingFilter();
 
         try {
-            WebResource resource = client.resource("http://host/path/documents?source=test&foreignId=test" + (int) Math.random() + "&mimeType=text/xml");
-            client.addFilter(new HTTPBasicAuthFilter("user", "password"));
+   			String fullContent = doc.getField("content").toString();
+ 			String content = URLEncoder.encode(fullContent);
+
+
+			String url = endpoint + "/documents?source=nutch&foreignId=test" + (int) Math.random() + "&mimeType=text/html&content=" + content;
+			WebResource resource = client.resource(url);
+            client.addFilter(new HTTPBasicAuthFilter(username,password));
 
             resource.addFilter(lg);
             System.out.println(resource.getURI());
 
-            String response = resource.post(String.class, "<foo></foo>");
+            resource.post(String.class,"");
         } catch (UniformInterfaceException e) {
             System.out.println("Write catch 1");
             String rawResponse = e.getResponse().getEntity(String.class);
