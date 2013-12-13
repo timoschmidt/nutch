@@ -22,131 +22,112 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.nutch.indexer.IndexWriter;
 import org.apache.nutch.indexer.NutchDocument;
-import org.apache.nutch.net.protocols.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 
 /**
  */
 public class SearchperienceIndexWriter implements IndexWriter {
-  public static Logger LOG = LoggerFactory.getLogger(SearchperienceIndexWriter.class);
 
-  private Configuration config;
+    private Configuration config;
 
-  private Client client;
+    private Client client;
 
-	@Override
-  public void open(JobConf job, String name) throws IOException {
-		System.out.println("SEARCHPERIENCE BEFORE OPEN");
-		try {
+    @Override
+    public void open(JobConf job, String name) throws IOException {
+        System.out.println("SEARCHPERIENCE BEFORE OPEN");
+        try {
 
-			//create connection to rest api
-			client = Client.create();
-		} catch (Exception e) {
-			if( e instanceof IOException) {
-				IOException ioe = (IOException) e;
-			} else {
-				System.out.println(e.getClass());
-			}
-			e.printStackTrace();
+            //create connection to rest api
+            client = Client.create();
+        } catch (Exception e) {
+            e.printStackTrace();
 
-			System.out.println("Open catch");
-		}
-		System.out.println("SEARCHPERIENCE AFTER OPEN");
+            System.out.println("Open catch");
+        }
+        System.out.println("SEARCHPERIENCE AFTER OPEN");
 
-  }
+    }
 
-	@Override
-	public void write(NutchDocument doc) throws IOException {
-		System.out.println("SEARCHPERIENCE WRITE");
-		SearchperienceDocument o;
-		try {
-		//	SearchperienceDocument document = new SearchperienceDocument();
-		//	document.setForeignId("dsds");
-			WebResource resource = client.resource("http://url/qvc/documents");
-			client.addFilter(new HTTPBasicAuthFilter("user", "password"));
+    /**/
+    @Override
+    public void write(NutchDocument doc) throws IOException {
+        System.out.println("SEARCHPERIENCE WRITE");
+        LoggingFilter lg = new LoggingFilter();
 
-			resource.queryParam("source", "source");
-			resource.queryParam("foreignId", "sasasa");
-			resource.queryParam("url", "http://foo.vbox/foo");
-			
-			System.out.println(resource.getRequestBuilder().toString());
-			String response = resource.post(String.class,"<foo>one</foo>");
+        try {
+            WebResource resource = client.resource("http://host/path/documents?source=test&foreignId=test" + (int) Math.random() + "&mimeType=text/xml");
+            client.addFilter(new HTTPBasicAuthFilter("user", "password"));
 
+            resource.addFilter(lg);
+            System.out.println(resource.getURI());
 
-		} catch (UniformInterfaceException e) {
+            String response = resource.post(String.class, "<foo></foo>");
+        } catch (UniformInterfaceException e) {
+            System.out.println("Write catch 1");
+            String rawResponse = e.getResponse().getEntity(String.class);
+            int status = e.getResponse().getClientResponseStatus().getStatusCode();
 
+            System.out.println("Error during request execution");
+            System.out.println("Status: " + status);
+            System.out.println("Content: " + rawResponse);
 
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println(e.getClass());
 
+            System.out.println("Write catch 2");
+            System.out.println(e.getMessage());
 
-			System.out.println("Write catch 1");
+            e.printStackTrace();
+        }
+    }
 
-			System.out.println(e.getResponse().getClientResponseStatus());
-			System.out.println(e.getResponse().getEntityInputStream());
-			System.out.println(e.getClass());
+    @Override
+    public void delete(String key) throws IOException {
+        System.out.println("SEARCHPERIENCE DELETE");
+        //delete by rest api
+    }
 
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		} catch (Exception e) {
-			System.out.println(e.getClass());
+    @Override
+    public void update(NutchDocument doc) throws IOException {
+        System.out.println("SEARCHPERIENCE UPDATE");
+        //update by restapi
+        write(doc);
+    }
 
-			System.out.println("Write catch 2");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+    @Override
+    public void commit() throws IOException {
+        System.out.println("SEARCHPERIENCE COMMIT");
 
-		}
+    }
 
-	}
-
-  @Override
-  public void delete(String key) throws IOException {
-	  System.out.println("SEARCHPERIENCE DELETE");
-	  //delete by rest api
-  }
-
-  @Override
-  public void update(NutchDocument doc) throws IOException {
-	  System.out.println("SEARCHPERIENCE UPDATE");
-	  //update by restapi
-    write(doc);
-  }
-
-  @Override
-  public void commit() throws IOException {
-	  System.out.println("SEARCHPERIENCE COMMIT");
-
-  }
-
-  @Override
-  public void close() throws IOException {
+    @Override
+    public void close() throws IOException {
 //	  client.close();
 
-	  commit();
-	  System.out.println("SEARCHPERIENCE CLOSE");
-  }
+        commit();
+        System.out.println("SEARCHPERIENCE CLOSE");
+    }
 
-  @Override
-  public String describe() {
-    StringBuffer sb = new StringBuffer("SearchperienceIndexWriter\n");
+    @Override
+    public String describe() {
+        StringBuffer sb = new StringBuffer("SearchperienceIndexWriter\n");
 
-    return sb.toString();
-  }
+        return sb.toString();
+    }
 
-  @Override
-  public void setConf(Configuration conf) {
-    config = conf;
-  }
-    
-  @Override
-  public Configuration getConf() {
-    return config;
-  }
+    @Override
+    public void setConf(Configuration conf) {
+        config = conf;
+    }
 
-
+    @Override
+    public Configuration getConf() {
+        return config;
+    }
 } 
